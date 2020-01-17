@@ -13,7 +13,7 @@ const
     MongoStore= require('connect-mongo'),
     connectFlash = require('connect-flash'),
     {stripTags} = require('./helpers/hbs'),
-    Post = require('./database/models/Article')
+    Post = require('./database/models/Article');
 
     port = 3000;
 
