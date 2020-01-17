@@ -1,0 +1,16 @@
+
+
+<section class="section">
+
+    <div class="container">
+        <h1 class="title">{{article.title}}</h1>
+        <p>{{stripTag article.content}}</p>
+        <br>
+        {{#if user}}
+        <a href="/article/{{article._id}}/articleEditor"><button class="button is-primary">Editer</button></a>
+        {{else}}
+        {{/if}}
+    </div>
+
+</section>
+

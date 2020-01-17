@@ -1,0 +1,39 @@
+<section class="section">
+    <form action="articleEditor/post" method="POST">
+
+        <div class="container">
+
+            <p></p>
+
+        </div>
+        <div class="field">
+
+            <div class="control">
+                <label for="" class="label">Title</label>
+                <textarea class="textarea" name="title" rows="1"> {{article.title}} </textarea>
+                <script>
+                    CKEDITOR.replace('title', {
+                        height: 50,
+                        uiColor: '#595959',
+                    });
+                </script>
+            </div>
+            <br>
+
+            <div class="control">
+                <label for="" class="label">Contenu</label>
+                <textarea class="textarea" name="content"> {{article.content}} </textarea>
+                <script>
+                    CKEDITOR.replace('content', {
+                        uiColor: '#595959'
+                    });
+                </script>
+            </div>
+
+            <br>
+            <a href=""><button class="button is-primary">Save</button></a>
+
+        </div>
+    </form>
+
+</section>
