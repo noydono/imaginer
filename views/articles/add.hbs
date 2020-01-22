@@ -1,14 +1,20 @@
 <section class="section">
     <div class="container is-fullhd">
 
-        <form method="post" action="/articles/post" enctype="multipart/form-data">
+        <form method="POST" action="/article/add" enctype="multipart/form-data">
 
             <div class="field">
 
                 <label for="" class="label">Titre de l'article</label>
 
                 <div class="control">
-                    <input type="text" class="input" name="title">
+                    <textarea type="text" class="input" name="title"></textarea>
+                    <script>
+                        CKEDITOR.replace('title',{
+                            height: 50,
+                        uiColor: '#595959',
+                        });
+                    </script>
                 </div>
 
             </div>
@@ -20,9 +26,10 @@
                 <div class="control">
                     <textarea class="textarea" name="content"></textarea>
                     <script>
-                        // Replace the <textarea id="editor1"> with a CKEditor
-                        // instance, using default configuration.
-                        CKEDITOR.replace('content');
+                        
+                        CKEDITOR.replace('content',{
+                            uiColor: '#595959',
+                        });
                     </script>
                 </div>
 
@@ -49,13 +56,13 @@
                             Envoyer une image
                         </span>
                     </span>
-                </label>
-            </div>
+                </label> 
+         </div>
 
             <div class="field is-grouped">
 
                 <div class="control">
-                    <button class="button is-link">Enregistrer</button>
+                    <button type="submit" class="button is-link">Enregistrer</button>
                 </div>
 
                 <div class="control">
@@ -65,5 +72,6 @@
             </div>
 
         </form>
+
     </div>
 </section>

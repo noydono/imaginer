@@ -18,34 +18,54 @@
 
         <div class="navbar-item">
 
-          
-
-
-        {{#if user}}
-        <div class="navbar-item">
-          <div class="buttons">
-            <a class="menu-link" href="/articles/add">
-            ajouter un article
-            </a>
+          {{#if user}}
+          <div class="navbar-item">
+            <div class="buttons">
+              <a class="menu-link" href="/chat">
+                Chat
+              </a>
+            </div>
           </div>
-        </div>
+          {{/if}}
 
-        <div class="navbar-item">
-          <div class="buttons">
-            <a class="menu-link" href="/user/logout">
-            Se déconnecter
-            </a>
+
+          {{#if isAdmin}}
+          <div class="navbar-item">
+            <div class="buttons">
+              <a class="menu-link" href="/admin">
+                admin
+              </a>
+            </div>
           </div>
-        </div>
-        {{else}}
+          {{else}}
+          {{/if}}
 
-        <div class="buttons">
-            <a class="menu-link" href="/user/login">
-              Se connecter
-            </a>
+
+          {{#if user}}
+          <div class="navbar-item">
+            <div class="buttons">
+              <a class="menu-link" href="/article/add">
+                ajouter un article
+              </a>
+            </div>
           </div>
-        </div>
 
+          <div class="navbar-item">
+            <div class="buttons">
+              <a class="menu-link" href="/user/logout">
+                Se déconnecter
+              </a>
+            </div>
+          </div>
+          {{else}}
+          <form action="">
+            <div class="buttons">
+              <a class="menu-link" href="/user/login">
+                Se connecter
+              </a>
+            </div>
+        </div>
+        </form>
         <div class="navbar-item">
           <div class="buttons">
             <a class="menu-link" href="/user/create">

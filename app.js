@@ -1,26 +1,32 @@
-
-
-
 const
     express = require('express'),
     app = express(),
+    http = require('http'),
+    io = require('socket.io'),
+    router = express.Router(),
     Handlebars = require('handlebars'),
     hbs = require('express-handlebars'),
     mongoose = require('mongoose'),
     bodyParser = require('body-parser'),
     fileupload = require('express-fileupload'),
     expressSession = require('express-session'),
-    MongoStore= require('connect-mongo'),
+    MongoStore = require('connect-mongo'),
     connectFlash = require('connect-flash'),
-    {stripTags} = require('./helpers/hbs'),
-    Post = require('./database/models/Article');
-
-    port = 3000;
-
+    {
+        stripTags
+    } = require('./helpers/hbs'),
+    port = 3000,
+    ROUTER = require('./api/router/router');
 //mongoose
+// mongoose.connect('mongodb://localhost:27017/blog', {
+
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true
+// })
 
 const db = require('./config/keys.js').MongoUrl
 mongoose
+
 .connect( db , {      
 
     useNewUrlParser: true,
@@ -29,50 +35,28 @@ mongoose
 .then(() => console.log('connecter a mongo cloud'))
 .catch(err => console.log(err));
 
-////////controllers
-
-//article
-
-const
-    articleAddController = require('./controllers/articleAdd'),
-    homepage = require('./controllers/homepage'),
-    articleSingleController = require('./controllers/articleSingle'),
-    articlePostController = require('./controllers/articlePost'),
-    articleEditor = require('./controllers/articleEditor'),
-    articleEditorPost = require('./controllers/articleEditorPost');
-
-
-//user
-
-const
-    userCreate = require('./controllers/userCreate'),
-    userRegister = require('./controllers/userRegister'),
-    userLogin = require('./controllers/userLogin'),
-    userLoginAuth = require('./controllers/userLoginAuth'),
-    userLogout = require('./controllers/userLogout');
-
-//handlebar moment formater l'heure
 
 var handlebars = require('handlebars');
 var momentHandlebars = require('handlebars.moment');
 momentHandlebars.registerHelpers(handlebars);
-
 //express
 
 const mongoStore = MongoStore(expressSession)
 
-app.use (expressSession({
+const server = http.createServer(app)
+const sio = io.listen(server);
+const session = expressSession({
 
-    secret:'securite',
+    secret: 'securite',
     name: 'biscuit',
     saveUninitialized: true,
     resave: false,
     store: new mongoStore({
-        mongooseConnection : mongoose.connection
+        mongooseConnection: mongoose.connection
     })
 
-}));
-
+}),
+sharedsession = require("express-socket.io-session");
 //app.use
 app.use(connectFlash())
 app.use(fileupload());
@@ -83,7 +67,6 @@ app.use(bodyParser.urlencoded({
     extended: true
 
 }));
-
 //handlebars
 
 app.set('view engine', 'hbs');
@@ -91,103 +74,65 @@ app.engine('hbs', hbs({
 
     extname: 'hbs',
     defaultLayout: 'main',
+    layoutsDir: __dirname + '/views/layouts/',
     helpers: {
-        stripTag : stripTags
+        stripTag: stripTags
     },
 
 }));
 
 
 
-app.use('*', (req,res,next) =>{
+app.use(session)
+app.use('*', (req, res, next) => {
 
-    // dit que  res.locals.user ⁼ a user id qui est attacher au cockies 
-    res.locals.user = req.session.userId;
-    next()
     
+    if (res.locals.user = req.session.userId) {
+        if (req.session.status === 'user') {
+
+            if (req.session.isAdmin === true) {
+
+
+
+                res.locals.isAdmin = req.session.isAdmin
+                
+            }
+            res.locals.user = req.session.status
+            
+
+        }
+    }
+
+    
+
+    // La function next permet qu'une fois la condition effectuer il reprenne son chemin
+    next()
+})
+
+sio.on('connection', (socket) => {
+    // const sess = req.session
+    console.log('User is connected with socketIO');
+    socket.on('disconnect', function() {
+        console.log('user is disconnected');
+    })
+    socket.on('chat message', (msg) => {
+        console.log('message reçu : ' + msg);
+        sio.emit('chat message', msg)
+    })
 })
 
 
-//Middleware
 
-const articleValidPost = require('./middleware/articleValidPost');
-app.use("/articles/post", articleValidPost);
-
-
-const auth = require('./middleware/auth');
-app.use ("/articles/add", auth);
-
-const redirectAuthSucess = require('./middleware/redirectAuthSucess');
+app.use('/', ROUTER)
 
 
 
-app.get('/', homepage);
-
-
-//Articles
-
-app.get('/articles/add', auth, articleAddController);
-app.get('/article/:id', articleSingleController);
-app.get('/article/:id/articleEditor', auth, articleEditor);
-app.post('/article/:id/articleEditor/post' , articleEditorPost);
-app.post('/articles/post',articleValidPost, articlePostController);
-
-
-
-//user
-
-
-app.get('/user/create', redirectAuthSucess, userCreate);
-app.post('/user/register',redirectAuthSucess, userRegister);
-app.get('/user/login',redirectAuthSucess, userLogin);
-app.post('/user/loginAuth',redirectAuthSucess, userLoginAuth);
-app.get('/user/logout', userLogout);
-
-
-//Contact
-
-app.get('/contact', (req, res) => {
-
-    res.render('contact')
-
-});
-
-app.use((req,res) => {
+app.use((req, res) => {
     res.render('error404')
 })
 
-
-// Handlebars.registerHelper('filter', (b) => {
-   
-//     const result =b.filter(c => revesB.length < 5)
-
-//     return option.inverse(result)
-// })
-
-
-// Handlebars.registerHelper('filter', function(a) {
-        
-
-//      if(a.length < 5){
-
-         
-//          return a
-
-//      }else{
-
-//         return a.slice(0,4)
-        
-//      }
-// })
-
-
-
-
-
-app.listen(port, () => {
+app.listen(process.env.PORT, () => {
 
     console.log("le serveur tourne sur le prt: " + port);
 
 });
-
-

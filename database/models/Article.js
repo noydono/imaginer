@@ -10,7 +10,8 @@ const ArticleSchema = new mongoose.Schema({
         createDate: {
                 type: Date,
                 default: new Date()
-        }
+        },
+        aticleId:String,
 
 })
 

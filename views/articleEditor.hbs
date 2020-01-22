@@ -1,5 +1,5 @@
 <section class="section">
-    <form action="articleEditor/post" method="POST">
+    <form  action="/article/{{article._id}}/articleEditor" method="POST">
 
         <div class="container">
 
@@ -31,7 +31,7 @@
             </div>
 
             <br>
-            <a href=""><button class="button is-primary">Save</button></a>
+            <a href=""><button type="submit" class="button is-primary">Save</button></a>
 
         </div>
     </form>
