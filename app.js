@@ -138,7 +138,7 @@ app.use((req, res) => {
     res.render('error404')
 })
 
-http.listen(3000, function () {
-    console.log('server on sur le port 3000');
+http.listen(process.env.PORT, function () {
+    console.log('server on sur le PORT');
 
 })
