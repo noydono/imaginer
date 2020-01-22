@@ -2,8 +2,8 @@ const
     express = require('express'),
     app = require('express')(),
     http = require('http').Server(app)
-    io =require('socket.io')(http);
-    router = express.Router(),
+io = require('socket.io')(http);
+router = express.Router(),
     Handlebars = require('handlebars'),
     hbs = require('express-handlebars'),
     mongoose = require('mongoose'),
@@ -27,18 +27,19 @@ const
 const db = require('./config/keys.js').MongoUrl
 mongoose
 
-.connect( db , {      
+    .connect(db, {
 
-    useNewUrlParser: true,
-    useUnifiedTopology: true 
-})
-.then(() => console.log('connecter a mongo cloud'))
-.catch(err => console.log(err));
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    })
+    .then(() => console.log('connecter a mongo cloud'))
+    .catch(err => console.log(err));
 
 
 var handlebars = require('handlebars');
 var momentHandlebars = require('handlebars.moment');
 momentHandlebars.registerHelpers(handlebars);
+
 //express
 const mongoStore = MongoStore(expressSession)
 
@@ -53,7 +54,8 @@ const session = expressSession({
         mongooseConnection: mongoose.connection
     })
 
-})
+}),
+sharedsession = require("express-socket.io-session");
 
 //app.use
 app.use(connectFlash())
@@ -65,6 +67,7 @@ app.use(bodyParser.urlencoded({
     extended: true
 
 }));
+
 //handlebars
 
 app.set('view engine', 'hbs');
@@ -79,12 +82,10 @@ app.engine('hbs', hbs({
 
 }));
 
-
-
 app.use(session)
 app.use('*', (req, res, next) => {
 
-    
+
     if (res.locals.user = req.session.userId) {
         if (req.session.status === 'user') {
 
@@ -93,53 +94,51 @@ app.use('*', (req, res, next) => {
 
 
                 res.locals.isAdmin = req.session.isAdmin
-                
+
             }
             res.locals.user = req.session.status
-            
+
 
         }
     }
-
-    
-
     // La function next permet qu'une fois la condition effectuer il reprenne son chemin
     next()
 })
 
-
-io.on('connection', function(socket) {
-
-    console.log('user connected');
-    socket.on('disconnect',function(){
-        console.log('a user is disconnected');
-        
-    })
-    socket.on('chat message', function(msg){
-        console.log('message recu :'+ msg);
-        io.emit('chat message' , msg)
-    })
+io.use(sharedsession(session));
+io.on('connection', function (socket) {
+    console.log(socket.handshake.session.nameSess);
     
-})
+    name = socket.handshake.session.nameSess
+    console.log(name + ' user connected');
 
+    socket.on('new user', (name) => {
+        console.log(name);
+        io.emit(' new user ', name + ' est connecter')
+    })
+
+    socket.on('disconnect', function () {
+
+        console.log(name + ' is disconnected');
+
+    })
+
+    socket.on('chat message', function (msg) {
+
+        name = socket.handshake.session.nameSess
+        io.emit('chat message', name + ':' + ' ' + msg)
+
+    })
+
+})
 
 app.use('/', ROUTER)
 
-
-
-// app.use((req, res) => {
-//     res.render('error404')
-// })
-
-
-
-http.listen(process.env.PORT,function(){
-    console.log('server on sur le port 3000');
-    
+app.use((req, res) => {
+    res.render('error404')
 })
-// var portcloud = process.env.PORT
-// app.listen(port, () => {
 
-//     console.log("le serveur tourne sur le prt: " + port);
+http.listen(3000, function () {
+    console.log('server on sur le port 3000');
 
-// });
+})

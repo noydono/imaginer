@@ -1,6 +1,8 @@
 <script src="/socket.io/socket.io.js"></script>
 
 <script>
+
+
     var socket = io()
 
     var send = function () {
@@ -10,19 +12,33 @@
 
     var receive = function (msg) {
         var li = document.createElement('li')
+
         li.innerText = msg
+
         document.getElementById('messages').appendChild(li)
     }
-    socket.on('chat message', receive)
+    listUser = (userlist) => {
+        var pseudo = 'bruno'
+        const li = document.createElement('li')
+        li.innerText = pseudo
+        document.getElementById('members').appendChild(li)
+    }
 
+    socket.on('chat message', receive)
+    socket.on('new user', listUser)
 </script>
 
 
 
 
+       
+
+
+
+<h3 class="title is-3">Chat</h3>
+            
 
 <div>
-    <h3 class="title is-3">Chat</h3>
 
     <ul id="messages"></ul>
 
@@ -46,15 +62,20 @@
 
 
 <style>
-   .inp{
-       width: 90%;
-   }
-   .bout{
-       width: 10%;
-   }
+    #message{
+        margin-left: 10px;
+    }
+    .inp {
+        width: 90%;
+    }
+
+    .bout {
+        width: 10%;
+    }
+
     .send-mess {
         margin-left: 20px;
-        margin-bottom: 10px ;
+        margin-bottom: 10px;
         width: 100%;
         position: absolute;
         left: 0;
