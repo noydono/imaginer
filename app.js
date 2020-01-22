@@ -1,8 +1,8 @@
 const
     express = require('express'),
-    app = express(),
-    http = require('http'),
-    io = require('socket.io'),
+    app = require('express')(),
+    http = require('http').Server(app)
+    io =require('socket.io')(http);
     router = express.Router(),
     Handlebars = require('handlebars'),
     hbs = require('express-handlebars'),
@@ -40,11 +40,9 @@ var handlebars = require('handlebars');
 var momentHandlebars = require('handlebars.moment');
 momentHandlebars.registerHelpers(handlebars);
 //express
-
 const mongoStore = MongoStore(expressSession)
 
-const server = http.createServer(app)
-const sio = io.listen(server);
+
 const session = expressSession({
 
     secret: 'securite',
@@ -55,8 +53,8 @@ const session = expressSession({
         mongooseConnection: mongoose.connection
     })
 
-}),
-sharedsession = require("express-socket.io-session");
+})
+
 //app.use
 app.use(connectFlash())
 app.use(fileupload());
@@ -109,33 +107,39 @@ app.use('*', (req, res, next) => {
     next()
 })
 
-sio.on('connection', (socket) => {
-    // const sess = req.session
-    console.log('User is connected with socketIO');
-    socket.on('disconnect', function() {
-        console.log('user is disconnected');
-    })
-    socket.on('chat message', (msg) => {
-        console.log('message reçu : ' + msg);
-        sio.emit('chat message', msg)
-    })
-})
 
+io.on('connection', function(socket) {
+
+    console.log('user connected');
+    socket.on('disconnect',function(){
+        console.log('a user is disconnected');
+        
+    })
+    socket.on('chat message', function(msg){
+        console.log('message recu :'+ msg);
+        io.emit('chat message' , msg)
+    })
+    
+})
 
 
 app.use('/', ROUTER)
 
 
 
-app.use((req, res) => {
-    res.render('error404')
+// app.use((req, res) => {
+//     res.render('error404')
+// })
+
+
+
+http.listen(3000,function(){
+    console.log('server on sur le port 3000');
+    
 })
+// var portcloud = process.env.PORT
+// app.listen(port, () => {
 
-app.listen(process.env.PORT, () => {
+//     console.log("le serveur tourne sur le prt: " + port);
 
-    console.log("le serveur tourne sur le prt: " + port);
-
-});
-
-
-//on sans fou
+// });
